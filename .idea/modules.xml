@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Pindu.iml" filepath="$PROJECT_DIR$/Pindu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GamePintu.iml" filepath="$PROJECT_DIR$/GamePintu.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
