@@ -58,10 +58,24 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
      */
     private int mWidth;
 
+    private GamePintuListener mGamePintuListener;
+
     public interface GamePintuListener {
         void nextLevel(int nextLevel);
         void timeChanged(int currentTime);
         void gameOver();
+    }
+
+    public void setGamePintuListener(GamePintuListener gamePintuListener) {
+        mGamePintuListener = gamePintuListener;
+    }
+
+    public void setColum(int colum) {
+        mColum = colum;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        mBitmap = bitmap;
     }
 
     public GamePintuLayout(Context context) {
@@ -95,16 +109,12 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
     }
 
     private void init() {
-
         //将dp转化为px
         mMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 3, getResources().getDisplayMetrics());
 
         mPadding = min(getPaddingLeft(), getPaddingRight(), getPaddingTop(),
                 getPaddingBottom());
-
-
-
     }
 
     /**
@@ -120,7 +130,6 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
         }
         return min;
     }
-
 
     /**
      * 设置ImageView（item）的宽高等属性
@@ -158,12 +167,10 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
                 lp.addRule(RelativeLayout.BELOW, mGamePintuItmes[i-mColum].getId());
             }
 
-
             addView(item, lp);
         }
 
     }
-
 
     /**
      * 进行切图和排序

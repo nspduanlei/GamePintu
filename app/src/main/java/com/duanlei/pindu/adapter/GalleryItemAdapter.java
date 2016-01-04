@@ -116,7 +116,7 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
         if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
         } else {
-            //imageView.setImageResource(R.mipmap.brian_up_close);
+            imageView.setImageResource(R.mipmap.default_img);
         }
     }
 
