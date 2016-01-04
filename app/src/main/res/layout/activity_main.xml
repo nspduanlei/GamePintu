@@ -9,7 +9,7 @@
         android:id="@+id/gv_images"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:numColumns="4"
+        android:numColumns="3"
         android:horizontalSpacing="@dimen/padding"
         android:verticalSpacing="@dimen/padding"
         android:layout_margin="@dimen/padding"/>

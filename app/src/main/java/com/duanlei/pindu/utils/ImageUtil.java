@@ -46,8 +46,11 @@ public class ImageUtil {
 
             //调用定义的方法计算inSampleSize的
 
-            int reqWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, width, context.getResources().getDisplayMetrics());
-            int reqHeight = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height, context.getResources().getDisplayMetrics());
+            //int reqWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, width, context.getResources().getDisplayMetrics());
+            //int reqHeight = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height, context.getResources().getDisplayMetrics());
+
+            int reqWidth = width;
+            int reqHeight = height;
 
             options.inSampleSize = calculateSampleSize(
                     options, reqWidth, reqHeight);
