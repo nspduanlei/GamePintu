@@ -92,7 +92,6 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
         }
 
         setMeasuredDimension(mWidth, mWidth);
-
     }
 
     private void init() {
