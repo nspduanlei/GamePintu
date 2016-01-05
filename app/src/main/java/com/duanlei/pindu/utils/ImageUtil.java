@@ -1,9 +1,7 @@
 package com.duanlei.pindu.utils;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.TypedValue;
 
 import com.duanlei.pindu.network.TieTuKuFetcher;
 
@@ -20,12 +18,11 @@ public class ImageUtil {
     /**
      * 将url转换成bitmap
      * @param url  图片链接
-     * @param context
      * @param width 控件宽度
      * @param height 控件高度
      * @return
      */
-    public static Bitmap getBitmapWithUrl(String url, Context context, int width, int height) {
+    public static Bitmap getBitmapWithUrl(String url, int width, int height) {
         try {
             byte[] bitmapBytes = new TieTuKuFetcher().getUrlBytes(url);
 
@@ -49,11 +46,8 @@ public class ImageUtil {
             //int reqWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, width, context.getResources().getDisplayMetrics());
             //int reqHeight = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height, context.getResources().getDisplayMetrics());
 
-            int reqWidth = width;
-            int reqHeight = height;
-
             options.inSampleSize = calculateSampleSize(
-                    options, reqWidth, reqHeight);
+                    options, width, height);
 
             //使用获取到的inSampleSize值再次解析图片
             options.inJustDecodeBounds = false;

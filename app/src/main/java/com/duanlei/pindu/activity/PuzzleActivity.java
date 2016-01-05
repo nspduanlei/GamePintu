@@ -49,7 +49,7 @@ public class PuzzleActivity extends AppCompatActivity implements GamePintuLayout
     private class GetImageTask extends AsyncTask<Void, Void, Bitmap> {
         @Override
         protected Bitmap doInBackground(Void... params) {
-            return ImageUtil.getBitmapWithUrl(url, PuzzleActivity.this,
+            return ImageUtil.getBitmapWithUrl(url,
                     ScreenUtils.getScreenWidth(PuzzleActivity.this),
                     ScreenUtils.getScreenWidth(PuzzleActivity.this));
         }

@@ -65,7 +65,7 @@ public class ThumbnailDownloader extends HandlerThread {
 
     private void handleRequest(final String url) {
 
-        final Bitmap bitmap = ImageUtil.getBitmapWithUrl(url, mContext,
+        final Bitmap bitmap = ImageUtil.getBitmapWithUrl(url,
                 ScreenUtils.getScreenWidth(mContext) / 3, ScreenUtils.getScreenWidth(mContext) / 3);
         mResponseHandler.post(new Runnable() {
             @Override
