@@ -8,18 +8,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.duanlei.pindu.R;
 import com.duanlei.pindu.adapter.GalleryItemAdapter;
 import com.duanlei.pindu.model.GalleryItem;
 import com.duanlei.pindu.network.TieTuKuFetcher;
+import com.duanlei.pindu.view.RefreshableView;
 
 import java.util.ArrayList;
 
 /**
- *
  * 选择图片
- *
+ * <p/>
  * Author: duanlei
  * Date: 2016-01-04
  */
@@ -29,11 +30,16 @@ public class MainActivity extends AppCompatActivity {
     private GalleryItemAdapter mAdapter;
 
     private GridView mGridView;
+    private RefreshableView refreshableView;
+
+    private boolean isRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        refreshableView = (RefreshableView) findViewById(R.id.refreshable_view);
 
         mGridView = (GridView) findViewById(R.id.gv_images);
         mAdapter = new GalleryItemAdapter(this, mItems, mGridView, new Handler());
@@ -47,6 +53,21 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
+            @Override
+            public void onRefresh() {
+                isRefresh = true;
+                new FetchItemsTask().execute();
+            }
+
+            @Override
+            public void onLoadMore() {
+                Toast.makeText(MainActivity.this, "加载更多。。。", Toast.LENGTH_SHORT).show();
+
+
+            }
+        }, 1);
 
         //获取图片库数据
         new FetchItemsTask().execute();
@@ -65,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
             mItems.addAll(items);
             mAdapter.notifyDataSetChanged();
             mAdapter.notifyLoad();
+
+            if (isRefresh)
+                refreshableView.finishRefreshing();
         }
     }
 

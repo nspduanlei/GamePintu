@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <GridView
-        android:id="@+id/gv_images"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numColumns="3"
-        android:horizontalSpacing="@dimen/padding"
-        android:verticalSpacing="@dimen/padding"
-        android:layout_margin="@dimen/padding"/>
+    <com.duanlei.pindu.view.RefreshableView
+        android:id="@+id/refreshable_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="0dp">
 
-</LinearLayout>
+        <GridView
+            android:id="@+id/gv_images"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/padding"
+            android:horizontalSpacing="@dimen/padding"
+            android:numColumns="3"
+            android:verticalSpacing="@dimen/padding"/>
+    </com.duanlei.pindu.view.RefreshableView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/colorAccent"
+        android:layout_alignParentBottom="true"
+        android:text="加载更多"
+        android:gravity="center"
+        android:visibility="gone"/>
+
+</RelativeLayout>

@@ -25,6 +25,8 @@ public class ImageUtil {
     public static Bitmap getBitmapWithUrl(String url, int width, int height) {
         try {
             byte[] bitmapBytes = new TieTuKuFetcher().getUrlBytes(url);
+            if (bitmapBytes == null)
+                return null;
 
             /**
              * inJustDecodeBounds 属性设置为true就可以让解析方法禁止为bitmap分配内存，返回值也
@@ -52,11 +54,9 @@ public class ImageUtil {
             //使用获取到的inSampleSize值再次解析图片
             options.inJustDecodeBounds = false;
 
-            final Bitmap bitmap = BitmapFactory
+
+            return BitmapFactory
                     .decodeByteArray(bitmapBytes, 0, bitmapBytes.length, options);
-
-
-            return bitmap;
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
