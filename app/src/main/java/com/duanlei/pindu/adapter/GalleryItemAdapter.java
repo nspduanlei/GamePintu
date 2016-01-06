@@ -163,6 +163,9 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
      */
     private void loadBitmaps(int firstVisibleItem, int visibleItemCount) {
         for (int i = firstVisibleItem; i < firstVisibleItem + visibleItemCount; i ++) {
+            if (mItems.size() == 0)
+                return;
+
             String imageUrl = mItems.get(i).getUrl();
             Bitmap bitmap = getBitmapFromMemCache(imageUrl);
             if (bitmap == null) {

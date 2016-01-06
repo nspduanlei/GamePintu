@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -15,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.duanlei.pindu.R;
@@ -23,7 +22,7 @@ import com.duanlei.pindu.R;
  * Author: duanlei
  * Date: 2016-01-05
  */
-public class RefreshableView extends LinearLayout implements View.OnTouchListener {
+public class RefreshableView extends ScrollView implements View.OnTouchListener {
 
     /**
      * 下拉状态
@@ -95,10 +94,10 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      */
     private View header;
 
-    /**
-     * 需要去下拉刷新的ListView
-     */
-    private AdapterView listView;
+//    /**
+//     * 需要去下拉刷新的ListView
+//     */
+//    private AdapterView listView;
 
     /**
      * 刷新时显示的进度条
@@ -144,7 +143,8 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      * 当前处理什么状态，可选值有STATUS_PULL_TO_REFRESH, STATUS_RELEASE_TO_REFRESH,
      * STATUS_REFRESHING 和 STATUS_REFRESH_FINISHED
      */
-    private int currentStatus = STATUS_REFRESH_FINISHED;;
+    private int currentStatus = STATUS_REFRESH_FINISHED;
+    ;
 
     /**
      * 记录上一次的状态是什么，避免进行重复操作
@@ -171,9 +171,11 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      */
     private boolean ableToPull;
 
-
+    private LinearLayout mLinearLayout;
 
     private Context mContext;
+
+    private AdapterView mAdapterView;
 
     /**
      * 下拉刷新控件的构造函数，会在运行时动态添加一个下拉头的布局。
@@ -183,18 +185,17 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      */
     public RefreshableView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        header = LayoutInflater.from(context).inflate(R.layout.pull_to_refresh, null, true);
+        mContext = context;
+    }
+
+    private void initHeader() {
+        preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         progressBar = (ProgressBar) header.findViewById(R.id.progress_bar);
         arrow = (ImageView) header.findViewById(R.id.arrow);
         description = (TextView) header.findViewById(R.id.description);
         updateAt = (TextView) header.findViewById(R.id.updated_at);
-        touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+        touchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
         refreshUpdatedAtValue();
-        setOrientation(VERTICAL);
-        addView(header, 0);
-
-        mContext = context;
     }
 
     /**
@@ -203,22 +204,46 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+//        if (changed && !loadOnce) {
+//            hideHeaderHeight = -header.getHeight();
+//            headerLayoutParams = (MarginLayoutParams) header.getLayoutParams();
+//            headerLayoutParams.topMargin = hideHeaderHeight;
+//
+//
+////            listView = (AdapterView) getChildAt(1);
+////            listView.setOnTouchListener(this);
+//
+//            setOnTouchListener(this);
+//
+//            loadOnce = true;
+//        }
+
+
         if (changed && !loadOnce) {
-            hideHeaderHeight = -header.getHeight();
+
+//            mLinearLayout = (LinearLayout) getChildAt(0);
+//            initHeader();
+//            mLinearLayout.addView(header, 0);
+//
+//            hideHeaderHeight = -header.getHeight();
+//            headerLayoutParams = (MarginLayoutParams) header.getLayoutParams();
+//            headerLayoutParams.topMargin = hideHeaderHeight;
+
+            mLinearLayout = (LinearLayout) getChildAt(0);
+
+            header = mLinearLayout.getChildAt(0);
+            initHeader();
+
             headerLayoutParams = (MarginLayoutParams) header.getLayoutParams();
-            headerLayoutParams.topMargin = hideHeaderHeight;
-            listView = (AdapterView) getChildAt(1);
-            listView.setOnTouchListener(this);
+            headerLayoutParams.topMargin = -header.getHeight();
+            header.setLayoutParams(headerLayoutParams);
 
-            footerLayoutParams = (MarginLayoutParams) listView.getLayoutParams();
+            mAdapterView = (AdapterView) mLinearLayout.getChildAt(1);
 
+            setOnTouchListener(this);
             loadOnce = true;
         }
     }
-
-
-    boolean ableToPullFooter;
-    MarginLayoutParams footerLayoutParams;
 
     /**
      * 当ListView被触摸时调用，其中处理了各种下拉刷新的具体逻辑。
@@ -252,11 +277,11 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
                         }
                         // 通过偏移下拉头的topMargin值，来实现下拉效果
                         headerLayoutParams.topMargin = (distance / 2) + hideHeaderHeight;
+
                         header.setLayoutParams(headerLayoutParams);
                     }
                     break;
                 case MotionEvent.ACTION_UP:
-                default:
                     if (currentStatus == STATUS_RELEASE_TO_REFRESH) {
                         // 松手时如果是释放立即刷新状态，就去调用正在刷新的任务
                         new RefreshingTask().execute();
@@ -266,25 +291,20 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
                     }
                     break;
             }
+
+
             // 时刻记得更新下拉头中的信息
             if (currentStatus == STATUS_PULL_TO_REFRESH
                     || currentStatus == STATUS_RELEASE_TO_REFRESH) {
                 updateHeaderView();
                 // 当前正处于下拉或释放状态，要让ListView失去焦点，否则被点击的那一项会一直处于选中状态
-                listView.setPressed(false);
-                listView.setFocusable(false);
-                listView.setFocusableInTouchMode(false);
+                mAdapterView.setPressed(false);
+                mAdapterView.setFocusable(false);
+                mAdapterView.setFocusableInTouchMode(false);
                 lastStatus = currentStatus;
                 // 当前正处于下拉或释放状态，通过返回true屏蔽掉ListView的滚动事件
                 return true;
             }
-        } else if (ableToPullFooter) {
-            float yMove = event.getRawY();
-            int distanceF = (int)yDown;
-
-            footerLayoutParams.bottomMargin = (distanceF / 2) + hideHeaderHeight;
-            listView.setLayoutParams(footerLayoutParams);
-
         }
         return false;
     }
@@ -292,10 +312,8 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
     /**
      * 给下拉刷新控件注册一个监听器。
      *
-     * @param listener
-     *            监听器的实现。
-     * @param id
-     *            为了防止不同界面的下拉刷新在上次更新时间上互相有冲突， 请不同界面在注册下拉刷新监听器时一定要传入不同的id。
+     * @param listener 监听器的实现。
+     * @param id       为了防止不同界面的下拉刷新在上次更新时间上互相有冲突， 请不同界面在注册下拉刷新监听器时一定要传入不同的id。
      */
     public void setOnRefreshListener(PullToRefreshListener listener, int id) {
         mListener = listener;
@@ -318,9 +336,9 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      * @param event
      */
     private void setIsAbleToPull(MotionEvent event) {
-        View firstChild = listView.getChildAt(0);
+        View firstChild = mAdapterView.getChildAt(0);
         if (firstChild != null) {
-            int firstVisiblePos = listView.getFirstVisiblePosition();
+            int firstVisiblePos = mAdapterView.getFirstVisiblePosition();
             if (firstVisiblePos == 0 && firstChild.getTop() == 0) {
                 if (!ableToPull) {
                     yDown = event.getRawY();
@@ -335,14 +353,13 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
                 ableToPull = false;
             }
 
-            Log.d("test01", "getCount : " + listView.getCount());
-            Log.d("test01", "getLastVisiblePosition : " + listView.getLastVisiblePosition());
-
-
-            if (listView.getLastVisiblePosition() == listView.getCount() - 1) {
+            //检测是否滑动到底部
+            View endChild = mAdapterView.getChildAt(mAdapterView.getChildCount() - 1);
+            if (mAdapterView.getLastVisiblePosition() == mAdapterView.getCount() - 1 &&
+                    endChild.getBottom() == mAdapterView.getHeight()) {
                 mListener.onLoadMore();
-                ableToPullFooter = true;
             }
+
 
         } else {
             // 如果ListView中没有元素，也应该允许下拉刷新
@@ -448,7 +465,6 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
             while (true) {
                 topMargin = topMargin + SCROLL_SPEED;
                 if (topMargin <= 0) {
-                    topMargin = 0;
                     break;
                 }
                 publishProgress(topMargin);
@@ -483,7 +499,6 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      * @author guolin
      */
     class HideHeaderTask extends AsyncTask<Void, Integer, Integer> {
-
         @Override
         protected Integer doInBackground(Void... params) {
             int topMargin = headerLayoutParams.topMargin;
@@ -521,8 +536,7 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
     /**
      * 使当前线程睡眠指定的毫秒数。
      *
-     * @param time
-     *            指定当前线程睡眠多久，以毫秒为单位
+     * @param time 指定当前线程睡眠多久，以毫秒为单位
      */
     private void sleep(int time) {
         try {

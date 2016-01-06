@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.duanlei.pindu.view.RefreshableView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/refreshable_view">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            layout="@layout/pull_to_refresh"/>
+
+        <com.duanlei.pindu.view.MyGridView
+            android:id="@+id/gv_images"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="@dimen/padding"
+            android:numColumns="3"
+            android:verticalSpacing="@dimen/padding"/>
+
+        <include
+            layout="@layout/pull_to_refresh_footer"/>
+
+    </LinearLayout>
+
+</com.duanlei.pindu.view.RefreshableView>

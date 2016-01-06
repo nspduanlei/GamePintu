@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.duanlei.pindu.R;
 import com.duanlei.pindu.adapter.GalleryItemAdapter;
@@ -34,10 +33,11 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isRefresh;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.test_main);
 
         refreshableView = (RefreshableView) findViewById(R.id.refreshable_view);
 
@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLoadMore() {
-                Toast.makeText(MainActivity.this, "加载更多。。。", Toast.LENGTH_SHORT).show();
 
 
             }
@@ -85,10 +84,11 @@ public class MainActivity extends AppCompatActivity {
             mItems.clear();
             mItems.addAll(items);
             mAdapter.notifyDataSetChanged();
-            mAdapter.notifyLoad();
 
-            if (isRefresh)
+            if (isRefresh) {
                 refreshableView.finishRefreshing();
+            }
+
         }
     }
 

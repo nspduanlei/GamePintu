@@ -106,7 +106,19 @@ public class ScreenUtils {
                 - statusBarHeight);
         view.destroyDrawingCache();
         return bp;
-
     }
+
+    /**
+     * 获取屏幕密度
+     * @param context
+     * @return
+     */
+    public static float getDeivceDensity(Context context) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        wm.getDefaultDisplay().getMetrics(metrics);
+        return metrics.density;
+    }
+
 
 }
