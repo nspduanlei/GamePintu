@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.duanlei.pindu.utils.ImageUtil;
+import com.duanlei.pindu.utils.ScreenUtils;
 
 /**
  * Author: duanlei
@@ -66,7 +67,7 @@ public class ThumbnailDownloader extends HandlerThread {
     private void handleRequest(final String url) {
 
         final Bitmap bitmap = ImageUtil.getBitmapWithUrl(url,
-                100, 100);
+                ScreenUtils.getScreenWidth(mContext) / 4, ScreenUtils.getScreenWidth(mContext) / 4);
         mResponseHandler.post(new Runnable() {
             @Override
             public void run() {

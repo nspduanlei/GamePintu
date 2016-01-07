@@ -3,9 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:layout_below="@id/refreshable_view"
+    android:id="@+id/ll_refresh_footer"
     android:gravity="center"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layout_alignParentBottom="true"
+    android:visibility="gone">
 
     <ProgressBar
         android:id="@+id/progress_bar_footer"

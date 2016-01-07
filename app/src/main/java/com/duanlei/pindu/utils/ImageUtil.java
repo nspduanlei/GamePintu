@@ -13,8 +13,6 @@ import java.io.IOException;
  */
 public class ImageUtil {
 
-
-
     /**
      * 将url转换成bitmap
      * @param url  图片链接

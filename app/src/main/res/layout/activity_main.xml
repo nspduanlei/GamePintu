@@ -1,26 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_load_more"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/colorAccent"
-        android:layout_alignParentBottom="true"
-        android:text="加载更多"
-        android:gravity="center"
-        android:visibility="gone"
-        android:layout_marginTop="5dp"/>
-
-    <com.duanlei.pindu.view.RefreshableView
-        android:id="@+id/refreshable_view"
+    <com.duanlei.pindu.view.RefreshableViewGridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/tv_load_more">
-
+        android:id="@+id/refreshable_view"
+        android:layout_marginBottom="0dp">
         <GridView
             android:id="@+id/gv_images"
             android:layout_width="match_parent"
@@ -28,7 +17,9 @@
             android:horizontalSpacing="@dimen/padding"
             android:numColumns="3"
             android:verticalSpacing="@dimen/padding"/>
-    </com.duanlei.pindu.view.RefreshableView>
+    </com.duanlei.pindu.view.RefreshableViewGridView>
 
+    <include
+        layout="@layout/pull_to_refresh_footer"/>
 
 </RelativeLayout>

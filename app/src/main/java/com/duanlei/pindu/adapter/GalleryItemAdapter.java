@@ -12,9 +12,9 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.duanlei.pindu.R;
+import com.duanlei.pindu.cache.DiskCache;
 import com.duanlei.pindu.model.GalleryItem;
 import com.duanlei.pindu.network.ThumbnailDownloader;
-import com.duanlei.pindu.view.RefreshableViewScroll;
 
 import java.util.ArrayList;
 
@@ -24,10 +24,16 @@ import java.util.ArrayList;
  */
 public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements AbsListView.OnScrollListener {
 
-    Activity mContext;
-    ArrayList<GalleryItem> mItems;
+    private Activity mContext;
+    private ArrayList<GalleryItem> mItems;
+
+    //内存缓存
     private LruCache<String, Bitmap> mMemoryCache;
-    ThumbnailDownloader mThumbnailThread;
+
+    //硬盘缓存
+    private DiskCache mDiskCache;
+
+    private ThumbnailDownloader mThumbnailThread;
     private GridView mGridView;
 
     /**
@@ -47,7 +53,7 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
 
 
     public GalleryItemAdapter(Activity context, ArrayList<GalleryItem> items,
-                              GridView gridView, Handler handler, RefreshableViewScroll refreshableView) {
+                              GridView gridView, Handler handler) {
         super(context, 0, items);
         mContext = context;
         mItems = items;
@@ -81,13 +87,18 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
             }
         };
 
+        mDiskCache = DiskCache.getDiskCache(mContext);
 
-
+        mGridView.setOnScrollListener(this);
     }
 
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             mMemoryCache.put(key, bitmap);
+        }
+
+        if (mDiskCache.get(key) == null) {
+            mDiskCache.put(key, bitmap);
         }
     }
 
@@ -150,9 +161,9 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
         }
     }
 
-//    public void notifyLoad() {
-//        loadBitmaps(0, mVisibleItemCount);
-//    }
+    public void notifyLoad() {
+        loadBitmaps(0, mVisibleItemCount);
+    }
 
     /**
      * 加载Bitmap对象，此方法后在LruCache中检查所有屏幕中可见的ImageView的对象
@@ -170,10 +181,20 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
                 return;
 
             String imageUrl = mItems.get(i).getUrl();
+
+            //从内存中获取
             Bitmap bitmap = getBitmapFromMemCache(imageUrl);
+
             if (bitmap == null) {
-                mThumbnailThread.queueThumbnail(imageUrl);
-            } else {
+                //如果为空从硬盘获取
+                bitmap = mDiskCache.get(imageUrl);
+                //如果硬盘不存在则从网络获取
+                if (bitmap == null) {
+                    mThumbnailThread.queueThumbnail(imageUrl);
+                }
+            }
+
+            if (bitmap != null) {
                 ImageView imageView = (ImageView) mGridView.findViewWithTag(imageUrl);
                 if (imageView != null) {
                     imageView.setImageBitmap(bitmap);

@@ -5,15 +5,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.animation.RotateAnimation;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -23,7 +22,7 @@ import com.duanlei.pindu.R;
  * Author: duanlei
  * Date: 2016-01-07
  */
-public class RefreshableView extends LinearLayout implements View.OnTouchListener {
+public class RefreshableViewGridView extends LinearLayout implements View.OnTouchListener {
 
     /**
      * 下拉状态
@@ -98,7 +97,7 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
     /**
      * 需要去下拉刷新的ListView
      */
-    private ListView listView;
+    private GridView mGridView;
 
     /**
      * 刷新时显示的进度条
@@ -177,7 +176,7 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      * @param context
      * @param attrs
      */
-    public RefreshableView(Context context, AttributeSet attrs) {
+    public RefreshableViewGridView(Context context, AttributeSet attrs) {
         super(context, attrs);
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         header = LayoutInflater.from(context).inflate(R.layout.pull_to_refresh, null, true);
@@ -201,8 +200,8 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
             hideHeaderHeight = -header.getHeight();
             headerLayoutParams = (MarginLayoutParams) header.getLayoutParams();
             headerLayoutParams.topMargin = hideHeaderHeight;
-            listView = (ListView) getChildAt(1);
-            listView.setOnTouchListener(this);
+            mGridView = (GridView) getChildAt(1);
+            mGridView.setOnTouchListener(this);
             loadOnce = true;
         }
     }
@@ -255,9 +254,9 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
                     || currentStatus == STATUS_RELEASE_TO_REFRESH) {
                 updateHeaderView();
                 // 当前正处于下拉或释放状态，要让ListView失去焦点，否则被点击的那一项会一直处于选中状态
-                listView.setPressed(false);
-                listView.setFocusable(false);
-                listView.setFocusableInTouchMode(false);
+                mGridView.setPressed(false);
+                mGridView.setFocusable(false);
+                mGridView.setFocusableInTouchMode(false);
                 lastStatus = currentStatus;
                 // 当前正处于下拉或释放状态，通过返回true屏蔽掉ListView的滚动事件
                 return true;
@@ -284,13 +283,16 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      */
     public void finishRefreshing() {
         currentStatus = STATUS_REFRESH_FINISHED;
-        preferences.edit().putLong(UPDATED_AT + mId, System.currentTimeMillis()).commit();
+        preferences.edit().putLong(UPDATED_AT + mId, System.currentTimeMillis()).apply();
         new HideHeaderTask().execute();
     }
 
 
-
     private boolean isLoadMore;
+
+    public void finishLoadMore() {
+        isLoadMore = false;
+    }
 
 
     /**
@@ -300,9 +302,9 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
      * @param event
      */
     private void setIsAbleToPull(MotionEvent event) {
-        View firstChild = listView.getChildAt(0);
+        View firstChild = mGridView.getChildAt(0);
         if (firstChild != null) {
-            int firstVisiblePos = listView.getFirstVisiblePosition();
+            int firstVisiblePos = mGridView.getFirstVisiblePosition();
 
             //检测是否到顶部
             if (firstVisiblePos == 0 && firstChild.getTop() == 0) {
@@ -319,15 +321,10 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
                 ableToPull = false;
             }
 
-            Log.d("test01", "listView.getLastVisiblePosition() : " + listView.getLastVisiblePosition());
-            Log.d("test01", "listView.getCount() : " + listView.getCount());
-
-            if (listView.getLastVisiblePosition() == listView.getCount() - 1) {
+            if (mGridView.getLastVisiblePosition() == mGridView.getCount() - 1) {
 
                 if (!isLoadMore) {
-                    View footer = LayoutInflater.
-                            from(getContext()).inflate(R.layout.pull_to_refresh_footer, null, true);
-                    listView.addFooterView(footer);
+                    mListener.onLoadMore();
                 }
 
                 isLoadMore = true;
@@ -516,6 +513,8 @@ public class RefreshableView extends LinearLayout implements View.OnTouchListene
          * 刷新时会去回调此方法，在方法内编写具体的刷新逻辑。注意此方法是在子线程中调用的， 你可以不必另开线程来进行耗时操作。
          */
         void onRefresh();
+
+        void onLoadMore();
 
     }
 

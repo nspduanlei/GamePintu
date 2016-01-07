@@ -7,7 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.duanlei.pindu.R;
-import com.duanlei.pindu.view.RefreshableViewScroll;
+import com.duanlei.pindu.view.RefreshableView;
 
 /**
  * Author: duanlei
@@ -15,10 +15,11 @@ import com.duanlei.pindu.view.RefreshableViewScroll;
  */
 public class TestActivity extends Activity {
 
-    RefreshableViewScroll refreshableView;
+    RefreshableView refreshableView;
     ListView listView;
     ArrayAdapter<String> adapter;
-    String[] items = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"};
+    String[] items = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"
+            , "Q"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,14 +27,14 @@ public class TestActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_test);
 
-        refreshableView = (RefreshableViewScroll) findViewById(R.id.refreshable_view);
+        refreshableView = (RefreshableView) findViewById(R.id.refreshable_view);
         listView = (ListView) findViewById(R.id.list_view);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         listView.setAdapter(adapter);
 
         refreshableView.setOnRefreshListener(
-                new RefreshableViewScroll.PullToRefreshListener() {
+                new RefreshableView.PullToRefreshListener() {
                     @Override
                     public void onRefresh() {
                         try {
@@ -44,10 +45,6 @@ public class TestActivity extends Activity {
                         refreshableView.finishRefreshing();
                     }
 
-                    @Override
-                    public void onLoadMore() {
-
-                    }
                 }, 0);
     }
 
