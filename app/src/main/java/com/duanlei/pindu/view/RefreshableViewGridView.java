@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -323,13 +322,8 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
             }
 
 
-            Log.d("test01", "bottom : " + mGridView.getChildAt(mGridView.getChildCount()).getBottom());
-
             //检测是否到底部部
             if (mGridView.getLastVisiblePosition() == mGridView.getCount() - 1) {
-
-
-
                 if (!isLoadMore) {
                     mListener.onLoadMore();
                 }
