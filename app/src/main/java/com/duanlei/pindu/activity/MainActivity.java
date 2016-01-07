@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
             mAdapter.notifyDataSetChanged();
 
             if (isRefresh) {
-                //mAdapter.notifyLoad();
+                mAdapter.notifyLoad();
                 refreshableView.finishRefreshing();
                 isRefresh = false;
             }

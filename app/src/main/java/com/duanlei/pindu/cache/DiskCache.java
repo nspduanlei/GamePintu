@@ -66,7 +66,6 @@ public class DiskCache  {
                     mDiskCache = new DiskCache(context);
                 }
             }
-
         }
         return mDiskCache;
     }
