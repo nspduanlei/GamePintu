@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.duanlei.pindu.R;
 import com.duanlei.pindu.model.GalleryItem;
 import com.duanlei.pindu.network.ThumbnailDownloader;
+import com.duanlei.pindu.view.RefreshableViewScroll;
 
 import java.util.ArrayList;
 
@@ -45,7 +46,8 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
     private boolean isFirstEnter = true;
 
 
-    public GalleryItemAdapter(Activity context, ArrayList<GalleryItem> items, GridView gridView, Handler handler) {
+    public GalleryItemAdapter(Activity context, ArrayList<GalleryItem> items,
+                              GridView gridView, Handler handler, RefreshableViewScroll refreshableView) {
         super(context, 0, items);
         mContext = context;
         mItems = items;
@@ -70,7 +72,7 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
         //获取到可用内存的最大值，使用内存超出这个值会引起OutOfMemory异常
         //LruCache通过构造函数传入缓存值，以KB 为单位
         int maxMemory = (int)(Runtime.getRuntime().maxMemory() / 1024);
-        int cacheSize = maxMemory / 4;
+        int cacheSize = maxMemory / 8;
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(String key, Bitmap bitmap) {
@@ -79,7 +81,8 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
             }
         };
 
-        mGridView.setOnScrollListener(this);
+
+
     }
 
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
@@ -147,9 +150,9 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> implements Abs
         }
     }
 
-    public void notifyLoad() {
-        loadBitmaps(0, mVisibleItemCount);
-    }
+//    public void notifyLoad() {
+//        loadBitmaps(0, mVisibleItemCount);
+//    }
 
     /**
      * 加载Bitmap对象，此方法后在LruCache中检查所有屏幕中可见的ImageView的对象

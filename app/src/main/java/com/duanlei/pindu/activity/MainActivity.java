@@ -13,7 +13,7 @@ import com.duanlei.pindu.R;
 import com.duanlei.pindu.adapter.GalleryItemAdapter;
 import com.duanlei.pindu.model.GalleryItem;
 import com.duanlei.pindu.network.TieTuKuFetcher;
-import com.duanlei.pindu.view.RefreshableView;
+import com.duanlei.pindu.view.RefreshableViewScroll;
 
 import java.util.ArrayList;
 
@@ -29,20 +29,23 @@ public class MainActivity extends AppCompatActivity {
     private GalleryItemAdapter mAdapter;
 
     private GridView mGridView;
-    private RefreshableView refreshableView;
+    private RefreshableViewScroll refreshableView;
 
-    private boolean isRefresh;
+    private boolean isRefresh, isLoadMore;
 
+    private int pageIndex = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test_main);
+        setContentView(R.layout.activity_main);
 
-        refreshableView = (RefreshableView) findViewById(R.id.refreshable_view);
+        refreshableView = (RefreshableViewScroll) findViewById(R.id.refreshable_view);
+
 
         mGridView = (GridView) findViewById(R.id.gv_images);
-        mAdapter = new GalleryItemAdapter(this, mItems, mGridView, new Handler());
+        mAdapter = new GalleryItemAdapter(this, mItems, mGridView, new Handler(), refreshableView);
+
         mGridView.setAdapter(mAdapter);
         //item图片点击
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -54,44 +57,65 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        refreshableView.setOnRefreshListener(new RefreshableView.PullToRefreshListener() {
+        refreshableView.setOnRefreshListener(new RefreshableViewScroll.PullToRefreshListener() {
             @Override
             public void onRefresh() {
                 isRefresh = true;
-                new FetchItemsTask().execute();
+                new FetchItemsTask().execute(1);
             }
 
             @Override
             public void onLoadMore() {
-
-
+                isLoadMore = true;
+                pageIndex ++;
+                new FetchItemsTask().execute(pageIndex);
             }
         }, 1);
 
         //获取图片库数据
-        new FetchItemsTask().execute();
+        new FetchItemsTask().execute(1);
     }
 
 
-    private class FetchItemsTask extends AsyncTask<Void, Void, ArrayList<GalleryItem>> {
+    private class FetchItemsTask extends AsyncTask<Integer, Void, ArrayList<GalleryItem>> {
         @Override
-        protected ArrayList<GalleryItem> doInBackground(Void... params) {
-            return new TieTuKuFetcher().fetchItems();
+        protected ArrayList<GalleryItem> doInBackground(Integer... params) {
+            return new TieTuKuFetcher().fetchItems(params[0]);
         }
 
         @Override
         protected void onPostExecute(ArrayList<GalleryItem> items) {
-            mItems.clear();
+            if (!isLoadMore) {
+                mItems.clear();
+            }
+
             mItems.addAll(items);
             mAdapter.notifyDataSetChanged();
+            //mAdapter.notifyLoad();
 
             if (isRefresh) {
                 refreshableView.finishRefreshing();
+                isRefresh = false;
             }
 
+            if (isLoadMore) {
+                if (items.size() > 0) {
+                    refreshableView.finishLoadMore();
+                } else {
+                    refreshableView.onMoreData();
+                }
+
+                isLoadMore = false;
+            }
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAdapter.quit();
+        mAdapter.clearQueue();
+    }
 }
 
 

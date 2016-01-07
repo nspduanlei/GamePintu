@@ -6,9 +6,9 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.util.Log;
 
 import com.duanlei.pindu.utils.ImageUtil;
-import com.duanlei.pindu.utils.ScreenUtils;
 
 /**
  * Author: duanlei
@@ -43,7 +43,7 @@ public class ThumbnailDownloader extends HandlerThread {
     }
 
     public void queueThumbnail(String url) {
-        //Log.i(TAG, "Got an URL: " + url);
+        Log.d("test01", "Got an URL: " + url);
         //requestMap.put(token, url);
         mHandler.obtainMessage(MESSAGE_DOWNLOAD, url).sendToTarget();
     }
@@ -66,7 +66,7 @@ public class ThumbnailDownloader extends HandlerThread {
     private void handleRequest(final String url) {
 
         final Bitmap bitmap = ImageUtil.getBitmapWithUrl(url,
-                ScreenUtils.getScreenWidth(mContext) / 3, ScreenUtils.getScreenWidth(mContext) / 3);
+                100, 100);
         mResponseHandler.post(new Runnable() {
             @Override
             public void run() {

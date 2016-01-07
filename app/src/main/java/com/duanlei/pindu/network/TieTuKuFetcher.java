@@ -70,11 +70,11 @@ public class TieTuKuFetcher {
      *
      * @return
      */
-    public ArrayList<GalleryItem> fetchItems() {
+    public ArrayList<GalleryItem> fetchItems(int pageIndex) {
         String url = Uri.parse(ENDPOINT_NEW).buildUpon()
                 .appendQueryParameter("key", API_KEY)
                 .appendQueryParameter("returntype", "json")
-                .appendQueryParameter("p", "1")
+                .appendQueryParameter("p", String.valueOf(pageIndex))
                 .appendQueryParameter("cid", "1")
                 .build().toString();
         return downloadGalleryItems(url);
