@@ -68,8 +68,7 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
         initBitmap();
         initItem();
 
-        setUpAnimLayout();
-
+        mAnimLayout = null;
         mFirst = null;
         mSecond = null;
     }
