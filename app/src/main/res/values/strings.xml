@@ -11,4 +11,9 @@
 
     <string name="load_more">加载更多。。</string>
     <string name="on_more_data">没有更多数据</string>
+    <string name="step_num">步数：%1$d</string>
+    <string name="timer_str">时间：%1$d 秒</string>
+    <string name="btn_show_image">原图</string>
+    <string name="btn_reset">重置</string>
+    <string name="str_next_page">下一张</string>
 </resources>

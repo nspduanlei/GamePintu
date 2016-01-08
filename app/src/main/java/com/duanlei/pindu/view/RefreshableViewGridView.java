@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -143,7 +144,8 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
      * 当前处理什么状态，可选值有STATUS_PULL_TO_REFRESH, STATUS_RELEASE_TO_REFRESH,
      * STATUS_REFRESHING 和 STATUS_REFRESH_FINISHED
      */
-    private int currentStatus = STATUS_REFRESH_FINISHED;;
+    private int currentStatus = STATUS_REFRESH_FINISHED;
+    ;
 
     /**
      * 记录上一次的状态是什么，避免进行重复操作
@@ -206,6 +208,11 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
         }
     }
 
+
+    private boolean ableToPullUp;
+    private float yMoveUp;
+    private boolean loadStatu;
+
     /**
      * 当ListView被触摸时调用，其中处理了各种下拉刷新的具体逻辑。
      */
@@ -239,7 +246,7 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
                     }
                     break;
                 case MotionEvent.ACTION_UP:
-                //default:
+                    //default:
                     if (currentStatus == STATUS_RELEASE_TO_REFRESH) {
                         // 松手时如果是释放立即刷新状态，就去调用正在刷新的任务
                         new RefreshingTask().execute();
@@ -261,6 +268,40 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
                 // 当前正处于下拉或释放状态，通过返回true屏蔽掉ListView的滚动事件
                 return true;
             }
+        } else if (ableToPullUp) {
+
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    yMoveUp = event.getRawY();
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+
+                    int distanceUp = (int) (event.getRawY() - yMoveUp);
+                    Log.d("test01", "distance ：" + distanceUp);
+                    yMoveUp = event.getRawY();
+
+                    if (distanceUp >= 0) {
+                        return false;
+                    }
+                    if (Math.abs(distanceUp) < touchSlop) {
+                        return false;
+                    }
+
+                    loadStatu = true;
+                    break;
+
+                case MotionEvent.ACTION_UP:
+
+                    if (loadStatu) {
+                        if (!isLoadMore) {
+                            mListener.onLoadMore();
+                        }
+                        isLoadMore = true;
+                    }
+
+                    break;
+            }
         }
         return false;
     }
@@ -268,10 +309,8 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
     /**
      * 给下拉刷新控件注册一个监听器。
      *
-     * @param listener
-     *            监听器的实现。
-     * @param id
-     *            为了防止不同界面的下拉刷新在上次更新时间上互相有冲突， 请不同界面在注册下拉刷新监听器时一定要传入不同的id。
+     * @param listener 监听器的实现。
+     * @param id       为了防止不同界面的下拉刷新在上次更新时间上互相有冲突， 请不同界面在注册下拉刷新监听器时一定要传入不同的id。
      */
     public void setOnRefreshListener(PullToRefreshListener listener, int id) {
         mListener = listener;
@@ -292,6 +331,7 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
 
     public void finishLoadMore() {
         isLoadMore = false;
+        loadStatu = false;
     }
 
 
@@ -321,13 +361,19 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
                 ableToPull = false;
             }
 
+            View endChild = mGridView.getChildAt(mGridView.getChildCount() - 1);
 
             //检测是否到底部部
-            if (mGridView.getLastVisiblePosition() == mGridView.getCount() - 1) {
-                if (!isLoadMore) {
-                    mListener.onLoadMore();
-                }
-                isLoadMore = true;
+            if (mGridView.getLastVisiblePosition() == mGridView.getCount() - 1 &&
+                    endChild.getBottom() == mGridView.getHeight()) {
+
+                ableToPullUp = true;
+//                if (!isLoadMore) {
+//                    mListener.onLoadMore();
+//                }
+//                isLoadMore = true;
+            } else {
+                ableToPullUp = false;
             }
 
         } else {

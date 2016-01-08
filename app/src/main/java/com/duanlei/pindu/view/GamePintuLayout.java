@@ -60,10 +60,25 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
 
     private GamePintuListener mGamePintuListener;
 
+    /**
+     * 重置游戏
+     */
+    public void gameReSet() {
+        removeAllViews();
+        initBitmap();
+        initItem();
+
+        setUpAnimLayout();
+
+        mFirst = null;
+        mSecond = null;
+    }
+
     public interface GamePintuListener {
         void nextLevel(int nextLevel);
         void timeChanged(int currentTime);
         void gameOver();
+        void step();
     }
 
     public void setGamePintuListener(GamePintuListener gamePintuListener) {
@@ -301,6 +316,8 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
                 //判断游戏是否成功
                 checkSuccess();
 
+                mGamePintuListener.step();
+
                 isAniming = false;
             }
 
@@ -326,7 +343,8 @@ public class GamePintuLayout extends RelativeLayout implements View.OnClickListe
         }
 
         if (isSuccess) {
-            Toast.makeText(getContext(), "Success, level up!!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "恭喜拼图成功！", Toast.LENGTH_LONG).show();
+            mGamePintuListener.gameOver();
         }
     }
 

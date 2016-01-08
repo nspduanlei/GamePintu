@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/colorLoadingBg"
+    android:gravity="center"
+    android:id="@+id/ll_loading"
+    android:visibility="gone">
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="50dip"
+        android:layout_height="50dip"/>
+
+</LinearLayout>

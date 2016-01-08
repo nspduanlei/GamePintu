@@ -30,7 +30,7 @@ import java.io.OutputStream;
  * Author: duanlei
  * Date: 2015-12-04
  */
-public class DiskCache  {
+public class DiskCache implements InterCache {
     /**
      * 1MB
      */
@@ -117,12 +117,9 @@ public class DiskCache  {
         return 1;
     }
 
-
     public synchronized Bitmap get(final String url) {
-
         // 图片解析器
         BitmapDecoder decoder = new BitmapDecoder() {
-
             @Override
             public Bitmap decodeBitmapWithOption(BitmapFactory.Options options) {
                 final InputStream inputStream = getInputStream(Md5Helper.toMD5(url));

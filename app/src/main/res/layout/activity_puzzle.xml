@@ -2,12 +2,67 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/rl_main">
+
+    <TextView
+        android:id="@+id/tv_step_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="@string/step_num"
+        android:textSize="25sp"/>
+
+    <TextView
+        android:id="@+id/tv_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:text="@string/timer_str"
+        android:textSize="25sp"/>
 
     <ViewStub
+        android:id="@+id/stub_import"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout="@layout/game_layout"
-        android:id="@+id/stub_import"/>
+        android:layout_below="@id/tv_step_num"
+        android:layout="@layout/game_layout"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btn_show_image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_bg"
+            android:text="@string/btn_show_image"/>
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_bg"
+            android:text="@string/btn_reset"/>
+
+        <Button
+            android:id="@+id/btn_next_page"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_bg"
+            android:text="@string/str_next_page"/>
+    </LinearLayout>
+
+    <include
+        layout="@layout/loading_layout"/>
 
 </RelativeLayout>
