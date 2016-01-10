@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.duanlei.pindu.R;
 import com.duanlei.pindu.adapter.GalleryItemAdapter;
+import com.duanlei.pindu.db.ImageDao;
 import com.duanlei.pindu.model.GalleryItem;
 import com.duanlei.pindu.network.TieTuKuFetcher;
 import com.duanlei.pindu.view.RefreshableViewGridView;
@@ -152,6 +153,16 @@ public class MainActivity extends AppCompatActivity {
             if (!isLoadMore) {
                 mItems.clear();
             }
+
+            //插入数据库
+
+            ImageDao imageDao = new ImageDao(MainActivity.this);
+
+            for (GalleryItem item : items) {
+                imageDao.add(item);
+            }
+            imageDao.close();
+
 
             mItems.addAll(items);
             mAdapter.notifyDataSetChanged();

@@ -14,9 +14,11 @@ import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.duanlei.pindu.R;
 import com.duanlei.pindu.cache.DoubleCache;
+import com.duanlei.pindu.db.ImageDao;
 import com.duanlei.pindu.utils.ImageUtil;
 import com.duanlei.pindu.utils.ScreenUtils;
 import com.duanlei.pindu.view.GamePintuLayout;
@@ -48,7 +50,11 @@ public class PuzzleActivity extends AppCompatActivity implements
 
         //得到参数
         url = getIntent().getStringExtra("url");
+        initTimer();
+        setImage();
+    }
 
+    private void setImage() {
         //得到缓存对象
         mDoubleCache = DoubleCache.getDoubleCache(this);
 
@@ -59,8 +65,6 @@ public class PuzzleActivity extends AppCompatActivity implements
         } else {
             new GetImageTask().execute();
         }
-
-        initTimer();
     }
 
     /**
@@ -81,13 +85,15 @@ public class PuzzleActivity extends AppCompatActivity implements
         loading_view.setOnClickListener(this);
     }
 
+    private TimerTask timerTask;
+
     /**
      * 初始化计时器
      */
     private void initTimer() {
         mMyHandler = new MyHandler();
         //为timer提供一个定时执行的任务，在Timer线程中无法直接操作UI线程
-        TimerTask timerTask = new TimerTask() {
+        timerTask = new TimerTask() {
             @Override
             public void run() {
                 mMyHandler.obtainMessage(MESSAGE_TIMER).sendToTarget();
@@ -95,8 +101,6 @@ public class PuzzleActivity extends AppCompatActivity implements
         };
 
         mTimer = new Timer(true);
-        //1s执行一次
-        mTimer.schedule(timerTask, 1000, 1000);
     }
 
 
@@ -114,7 +118,8 @@ public class PuzzleActivity extends AppCompatActivity implements
     @Override
     public void gameOver() {
         //退出计时器
-        mTimer.cancel();
+        //mTimer.cancel();
+        setNextImage();
     }
 
     @Override
@@ -125,6 +130,8 @@ public class PuzzleActivity extends AppCompatActivity implements
 
     //图片加载时显示的控件
     private View loading_view;
+
+    private boolean isNext;
 
     @Override
     public void onClick(View v) {
@@ -140,11 +147,26 @@ public class PuzzleActivity extends AppCompatActivity implements
                 break;
 
             case R.id.btn_next_page: //下一张图片
+
+                setNextImage();
+
                 break;
             case R.id.ll_loading: //隐藏原图显示
                 hideImageView();
                 break;
         }
+    }
+
+
+    private void setNextImage() {
+        ImageDao imageDao = new ImageDao(this);
+        url = imageDao.getNextImage(url);
+        if (url == null) {
+            Toast.makeText(this, "没有下一张了！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        isNext = true;
+        setImage();
     }
 
     /**
@@ -246,14 +268,21 @@ public class PuzzleActivity extends AppCompatActivity implements
     private GamePintuLayout puzzleView;
 
     private void setBitmap() {
-        puzzleView =
-                (GamePintuLayout) ((ViewStub) findViewById(R.id.stub_import)).inflate();
-        puzzleView.setBitmap(mBitmap);
-        puzzleView.setGamePintuListener(this);
+        if (!isNext) {
+            puzzleView =
+                    (GamePintuLayout) ((ViewStub) findViewById(R.id.stub_import)).inflate();
+            puzzleView.setGamePintuListener(this);
+            relativeLayout = (RelativeLayout) findViewById(R.id.rl_main);
+            puzzleView.setBitmap(mBitmap);
+            addImageView();
 
-        relativeLayout = (RelativeLayout) findViewById(R.id.rl_main);
-
-        addImageView();
+            //1s执行一次
+            mTimer.schedule(timerTask, 1000, 1000);
+        } else {
+            mImageView.setImageBitmap(mBitmap);
+            puzzleView.setBitmap(mBitmap);
+            gameReSet();
+        }
     }
 
     private static final int MESSAGE_TIMER = 0;
