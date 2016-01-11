@@ -208,7 +208,6 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
         }
     }
 
-
     private boolean ableToPullUp;
     private float yMoveUp;
     private boolean loadStatu;
@@ -326,14 +325,12 @@ public class RefreshableViewGridView extends LinearLayout implements View.OnTouc
         new HideHeaderTask().execute();
     }
 
-
     private boolean isLoadMore;
 
     public void finishLoadMore() {
         isLoadMore = false;
         loadStatu = false;
     }
-
 
     /**
      * 根据当前ListView的滚动状态来设定 {@link #ableToPull}

@@ -34,15 +34,16 @@ public class ImageDao implements InterDao {
             ContentValues values = new ContentValues();
             values.put("url", galleryItem.getUrl());
             db.insert(PuzzleSQLiteHelper.IMAGES_TABLE, null, values);
-        } else {
-            cursor.moveToFirst();
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
-            ContentValues valuesUpdate = new ContentValues();
-            valuesUpdate.put("id", id);
-            valuesUpdate.put("url", galleryItem.getUrl());
-            db.update(PuzzleSQLiteHelper.IMAGES_TABLE, valuesUpdate, "id = ?",
-                    new String[]{String.valueOf(id)});
         }
+//        else {
+//            cursor.moveToFirst();
+//            int id = cursor.getInt(cursor.getColumnIndex("id"));
+//            ContentValues valuesUpdate = new ContentValues();
+//            valuesUpdate.put("id", id);
+//            valuesUpdate.put("url", galleryItem.getUrl());
+//            db.update(PuzzleSQLiteHelper.IMAGES_TABLE, valuesUpdate, "id = ?",
+//                    new String[]{String.valueOf(id)});
+//        }
 
         cursor.close();
     }
@@ -101,7 +102,7 @@ public class ImageDao implements InterDao {
         if (galleryItem != null) {
             return  galleryItem.getUrl();
         } else {
-            return null;
+            return read(1).getUrl();
         }
     }
 

@@ -145,7 +145,17 @@ public class MainActivity extends AppCompatActivity {
     private class FetchItemsTask extends AsyncTask<Integer, Void, ArrayList<GalleryItem>> {
         @Override
         protected ArrayList<GalleryItem> doInBackground(Integer... params) {
-            return new TieTuKuFetcher().fetchItems(params[0]);
+
+            ArrayList<GalleryItem>  list = new TieTuKuFetcher().fetchItems(params[0]);
+
+            //插入数据库
+            ImageDao imageDao = new ImageDao(MainActivity.this);
+            for (GalleryItem item : list) {
+                imageDao.add(item);
+            }
+            imageDao.close();
+
+            return list;
         }
 
         @Override
@@ -153,15 +163,6 @@ public class MainActivity extends AppCompatActivity {
             if (!isLoadMore) {
                 mItems.clear();
             }
-
-            //插入数据库
-
-            ImageDao imageDao = new ImageDao(MainActivity.this);
-
-            for (GalleryItem item : items) {
-                imageDao.add(item);
-            }
-            imageDao.close();
 
 
             mItems.addAll(items);

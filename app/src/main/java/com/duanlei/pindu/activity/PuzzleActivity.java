@@ -103,8 +103,6 @@ public class PuzzleActivity extends AppCompatActivity implements
         mTimer = new Timer(true);
     }
 
-
-
     @Override
     public void nextLevel(int nextLevel) {
 
@@ -157,12 +155,18 @@ public class PuzzleActivity extends AppCompatActivity implements
         }
     }
 
+    private boolean isNoData;
 
     private void setNextImage() {
+        if (isNoData) {
+            Toast.makeText(this, "没有下一张了！", Toast.LENGTH_SHORT).show();
+            return;
+        }
         ImageDao imageDao = new ImageDao(this);
         url = imageDao.getNextImage(url);
         if (url == null) {
             Toast.makeText(this, "没有下一张了！", Toast.LENGTH_SHORT).show();
+            isNoData = true;
             return;
         }
         isNext = true;
